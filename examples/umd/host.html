@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <link rel="icon" href="favicon.ico" />
+        <title>msgio:host</title>
+    </head>
+    <body>
+        <div style="color: red">See output int the console!</div>
+        <div>This is the iframe host</div>
+        <div style="width: 300px; overflow-x: scroll;">
+            <iframe src="http://localhost:4567/guest.html" width="100%" id="iframe"></iframe>
+        </div>
+        <script src="msgio.min.js"></script>
+        <script>
+         const iframe = document.getElementById('iframe');
+
+         let sum = 0;
+
+         const summarize = (...args) => args.reduce((acc, cur) => (acc + cur), 0);
+
+         const multiply = (a, b) => Promise.resolve(a * b);
+
+         const throw1 = () => {
+             throw new Error('This is Error1 message');
+         };
+
+         const throw2 = () => {
+             return Promise.reject(new Error('This is Error2 message'));
+         };
+
+         const onLoad = e => {
+             const io = new window.msgio.Iframe(e.target);
+
+             io.on('connect', socket => {
+                 console.log('[host]: connected!');
+
+                 socket.on('guest_event_1', (...args) => {
+                     console.log('[host]: receive "guest_event_1" from the guest with ', ...args);
+                 });
+
+                 socket.emit('host_event_1', {x: 'x', y: 'y', z: 'z'});
+
+                 socket.func('summarize', summarize);
+
+                 socket.func('multiply', multiply);
+
+                 socket.func('throw1', throw1);
+
+                 socket.func('throw2', throw2);
+
+                 socket.call('concat', 'hello', ' ', 'world', '!').then(result => {
+                     console.log('[host]: called function "concat" in the guest with "hello, world, !" and receive the return value', '"', result, '"');
+                 });
+             });
+         };
+
+         iframe.addEventListener('load', onLoad);
+        </script>
+    </body>
+</html>

@@ -6,6 +6,11 @@ If you are familiar with `socket.io`, you already know how to use this package.
 
 `msgio` is based on postMessage.
 
+Occasionally, we need to build web apps with iframes agross different domains. Communication between these iframes always make us uncomfortable
+.Using this library less pain you will suffer.
+
+## Examples
+All examples are in the 'examples' directory in this repository.
 
 ## Install
 
